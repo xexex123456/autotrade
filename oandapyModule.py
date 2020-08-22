@@ -50,9 +50,12 @@ from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 from sklearn.linear_model import Ridge
  
-#アカウントID入力
-accountID = ""
-access_token = ""
+#APIkeyを読み込む
+path = "./APIKEY.ini"
+f = open(path)
+l_strip = [s.strip() for s in f.readlines()]
+accountID = l_strip[0]
+access_token = l_strip[1]
  
  
 api = oandapyV20.API(access_token = access_token, environment = "practice")
@@ -61,6 +64,7 @@ slippage=0.003
 term=30
 debug=1
 break_num=0.02
+
  
 #テスト用のパラメータをセットする。
 def setTestNum(_x1=10000,_x2=0.003,_x3=30,_x4=1,_x5=0.02):
