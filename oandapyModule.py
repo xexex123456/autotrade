@@ -50,8 +50,9 @@ from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 from sklearn.linear_model import Ridge
  
-accountID = "101-009-16031759-001"
-access_token = "66e15a55674f1d33bf39892ddd508e76-2d72159f8a27ceaf1e74b390008ec821"
+#アカウントID入力
+accountID = ""
+access_token = ""
  
  
 api = oandapyV20.API(access_token = access_token, environment = "practice")
