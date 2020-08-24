@@ -8,12 +8,13 @@
 # flagは連想配列で作られている。
 # 開発はVSCodeで行っているためpyCharmではWarningが出るかもしれません。
 # TODO:リッジ回帰の学習精度が低いため、入力値を変更する必要がある
+# TODO:機能ごとにファイル分割をする
 ######################################################################################
 # backtest			: バックテストの結果をprintする
 # breakout			: ブレイクを判定する。ドンチャン法
 # breakout2			: ブレイクを判定する。価格予想を用いたドンチャン法
 # breakout3			: ブレイクを判定する。ポリンジャーバンドを利用。
-# checkOrder		: オーダーが通っているか判定する。TODO:実際のオーダー情報を取得する
+# checkOrder		: オーダーが通っているか判定する。
 # closePosition	 	: ポジションを決済する
 # entrySignal		: エントリー注文を出す
 # getMovingAverage	: 移動平均を計算する
@@ -30,7 +31,7 @@
 # printLog			: ログ情報の一番最後をプリントする
 # printPrice		: 時間と始値と終値をprintする
 # records			: 各トレードのパフォーマンスを記録する
-# setTestNum		: テスト用のパラメータをセットする。TODO:セットできない
+# setTestNum		: テスト用のパラメータをセットする。
 # tradeCloseDecide	: ポジションをクローズする
 ######################################################################################
 import oandapyV20
@@ -68,6 +69,12 @@ break_num=0.02
  
 #テスト用のパラメータをセットする。
 def setTestNum(_x1=10000,_x2=0.003,_x3=30,_x4=1,_x5=0.02):
+	global lot
+	global slippage
+	global term
+	global debug
+	global break_num
+
 	lot = _x1
 	slippage = _x2
 	term = _x3
@@ -322,6 +329,8 @@ def closePosition( data,last_data,flag ,chart_ins):
 			records( flag,data )
 			flag["position"]["exist"] = False
 			flag["position"]["count"] = 0
+			flag["position"]["side"] = ""
+			flag["position"]["price"] = 0
 			
 	if flag["position"]["side"] == "SELL":
 		#ポジションが「売り」でbreakout判定が「買い」の場合
@@ -338,22 +347,45 @@ def closePosition( data,last_data,flag ,chart_ins):
 			records( flag,data )
 			flag["position"]["exist"] = False
 			flag["position"]["count"] = 0
+			flag["position"]["side"] = ""
+			flag["position"]["price"] = 0
 			
 	return flag
 	
  
 #サーバーに出した注文が約定したかどうかチェックする関数
-def checkOrder( flag ):
+def checkOrder( flag ,chart_ins):
 	
-	#TODO:未完成
+
+	p = positions.PositionDetails(accountID=accountID, instrument=chart_ins)
+	rv = api.request( p )
+
+	#print(rv)
 	#注文状況を確認して通っていたら以下を実行
+	if rv["position"]["long"]["units"] != "0":
+		flag["order"]["exist"] = False
+		flag["order"]["count"] = 0
+		flag["position"]["exist"] = True
+		flag["position"]["side"] = "BUY"
+		flag["position"]["price"] = float(rv["position"]["long"]["averagePrice"]) * float(rv["position"]["long"]["units"])
+		print(rv["position"]["long"]["averagePrice"])
+	elif rv["position"]["short"]["units"] != "0":
+		flag["order"]["exist"] = False
+		flag["order"]["count"] = 0
+		flag["position"]["exist"] = True
+		flag["position"]["side"] = "SELL"
+		flag["position"]["price"] = -1 * float(rv["position"]["short"]["averagePrice"]) * float(rv["position"]["short"]["units"])
+		print(rv["position"]["short"]["averagePrice"])
 	#注文が通っていなければキャンセルする
+	else:
+		flag["order"]["exist"] = False
+		flag["order"]["count"] = 0
+		flag["position"]["exist"] = False
+		flag["position"]["count"] = 0
+		flag["position"]["side"] = ""
+		flag["position"]["price"] = 0
+
 	
-	flag["order"]["exist"] = False
-	flag["order"]["count"] = 0
-	flag["position"]["exist"] = True
-	flag["position"]["side"] = flag["order"]["side"]
-	flag["position"]["price"] = flag["order"]["price"]
 	
 	return flag
 	

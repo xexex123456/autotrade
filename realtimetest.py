@@ -61,25 +61,6 @@ def realtimetestmain(chart_ins,chart_sec,term):
 	i = 0
 	X = oandapyModule.predictRidge(ridge,price1,0,5000)
 	price = []
-	#for i,x in enumerate(price1):
-	#	price.append({ "close_time" : x["close_time"] ,
-	#				"open_price" :     x["open_price"] ,
-	#				"close_price" :    x["close_price"] ,
-	#				"low_price" :      x["low_price"] ,
-	#				"high_price" :     x["high_price"] ,
-	#				"pred_price" :     X[i]})
-	print("--------------------------")
-	print("テスト期間：")
-	print("開始時点 : " + str(price[0]["close_time"]))
-	print("終了時点 : " + str(price[-1]["close_time"]))
-	print(str(len(price)) + "件のローソク足データで検証")
-	print("--------------------------")
-
-	#i=0
-	#price1 = oandapyModule.getPrice(chart_ins,"M1",5000)
-	#ridge = Ridge(alpha=0.1)
-	#oandapyModule.learnRidge2(ridge,price1)
-	#price = []
 
 	last_data = price
 	#price1から価格情報に加えて価格予測値を代入して成形する
@@ -91,9 +72,16 @@ def realtimetestmain(chart_ins,chart_sec,term):
 					"high_price" :     x["high_price"] ,
 					"pred_price" :     X[i]})
 	print(i)
+	print("--------------------------")
+	print("テスト期間：")
+	print("開始時点 : " + str(price[0]["close_time"]))
+	print("終了時点 : " + str(price[-1]["close_time"]))
+	print(str(len(price)) + "件のローソク足データで検証")
+	print("--------------------------")
 	#メインループ
 	#過去5000足の情報に現在価格を付け加えていく
 	#60秒ごとに1分足の情報を加える処理にと価格予測を行う
+	flag = oandapyModule.checkOrder( flag ,chart_ins)
 	while i < 10000:
 		try:
 			price1 = price1 + oandapyModule.getPriceNow(chart_ins, "M1")
@@ -113,7 +101,7 @@ def realtimetestmain(chart_ins,chart_sec,term):
 			#エントリークローズ確認をする
 			#未約定の注文がないかチェック
 			if flag["order"]["exist"]: 
-				flag = oandapyModule.checkOrder( flag )
+				flag = oandapyModule.checkOrder( flag ,chart_ins)
 			#ポジションがある場合、クローズ条件を満たすか確認する
 			elif flag["position"]["exist"]:
 				flag = oandapyModule.closePosition( data,last_data,flag,chart_ins ) #ポジションがあれば決済条件を満たしていないかチェック
@@ -132,7 +120,8 @@ def realtimetestmain(chart_ins,chart_sec,term):
 				oandapyModule.backtest(flag)
 			time.sleep(60)
 		except:
-			time.sleep(60)
+			print("error 時間足{0}、通貨ペア{1}".format(chart_ins,chart_sec))
+			time.sleep(6)
  
 
 
@@ -140,10 +129,7 @@ def realtimetestmain(chart_ins,chart_sec,term):
 #パラメータを設定する。
 chart_ins = "USD_HUF"
 chart_sec = "M1"         # 1時間足
-term = 20                #過去ｎ日の設定
-try:
-	realtimetestmain(chart_ins,chart_sec,term)
-except:
-	#例外発生時は5秒停止する
-	print("error 時間足{0}、通貨ペア{1}".format(chart_ins,chart_sec))
-	time.sleep(5)
+term = 30                #過去ｎ日の設定
+oandapyModule.setTestNum(10000,0.003,30,1,0)
+realtimetestmain(chart_ins,chart_sec,term)
+print("error 時間足{0}、通貨ペア{1}".format(chart_ins,chart_sec))

@@ -52,9 +52,9 @@ def breaktestmain(chart_ins,chart_sec,term):
 
 	#価格チャートを取得 price1に価格情報を代入
 	#実験用 現在から5000足取得する
-	#price1 = oandapyModule.getPrice(chart_ins,chart_sec,5000)
+	price1 = oandapyModule.getPrice(chart_ins,chart_sec,5000)
 	#検証用 期間を指定して価格を取得する。
-	price1 = oandapyModule.getPriceHist(chart_ins,chart_sec,"2020-01-01T00:00:00.000000Z")
+	#price1 = oandapyModule.getPriceHist(chart_ins,chart_sec,"2020-01-01T00:00:00.000000Z")
 	#リッジ回帰の定義、学習
 	ridge = Ridge(alpha=1)
 	oandapyModule.learnRidge2(ridge,price1)
@@ -119,7 +119,7 @@ def breaktestmain(chart_ins,chart_sec,term):
 #メイン処理
 #パラメータを設定する。
 #購入ロット数、スリッページ、移動平均期間、デバッグパラメータ、ブレイクアウト変数
-oandapyModule.setTestNum(1)
+oandapyModule.setTestNum()
 #通貨ペア一覧
 chart_ins = ["USD_JPY","EUR_JPY","AUD_JPY","GBP_JPY","NZD_JPY","CAD_JPY","CHF_JPY","ZAR_JPY","EUR_USD","GBP_USD","NZD_USD","AUD_USD","USD_CHF","EUR_CHF","GBP_CHF","EUR_GBP","AUD_NZD","AUD_CAD","AUD_CHF","CAD_CHF","EUR_AUD","EUR_CAD","EUR_DKK","EUR_NOK","EUR_NZD","EUR_SEK","GBP_AUD","GBP_CAD","GBP_NZD","NZD_CAD","NZD_CHF","USD_CAD","USD_DKK","USD_NOK","USD_SEK","AUD_HKD","AUD_SGD","CAD_HKD","CAD_SGD","CHF_HKD","CHF_ZAR","EUR_CZK","EUR_HKD","EUR_HUF","EUR_PLN","EUR_SGD","EUR_TRY","EUR_ZAR","GBP_HKD","GBP_PLN","GBP_SGD","GBP_ZAR","HKD_JPY","NZD_HKD","NZD_SGD","SGD_CHF","SGD_HKD","SGD_JPY","TRY_JPY","USD_CNH","USD_CZK","USD_HKD","USD_HUF","USD_INR","USD_MXN","USD_PLN","USD_SAR","USD_SGD","USD_THB","USD_TRY","USD_ZAR"]
 #時間足一覧
