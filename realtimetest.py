@@ -130,6 +130,6 @@ def realtimetestmain(chart_ins,chart_sec,term):
 chart_ins = "USD_HUF"
 chart_sec = "M1"         # 1時間足
 term = 30                #過去ｎ日の設定
-oandapyModule.setTestNum(10000,0.003,30,1,0)
+oandapyModule.setTestNum(10000,0.003,30,0,0)
 realtimetestmain(chart_ins,chart_sec,term)
 print("error 時間足{0}、通貨ペア{1}".format(chart_ins,chart_sec))

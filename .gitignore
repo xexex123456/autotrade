@@ -2,3 +2,4 @@
 /test*
 /breaktest_result*
 /log
+/__pycache__

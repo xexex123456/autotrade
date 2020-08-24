@@ -362,6 +362,14 @@ def checkOrder( flag ,chart_ins):
 
 	#print(rv)
 	#注文状況を確認して通っていたら以下を実行
+	if debug == 1:
+		flag["order"]["exist"] = False
+		flag["order"]["count"] = 0
+		flag["position"]["exist"] = True
+		flag["position"]["side"] = flag["order"]["side"]
+		flag["position"]["price"] = flag["order"]["price"]
+		return flag
+
 	if rv["position"]["long"]["units"] != "0":
 		flag["order"]["exist"] = False
 		flag["order"]["count"] = 0
@@ -526,6 +534,23 @@ def learnRidge2(ridge,price):
 		X_next[i] = x["close_price"]
 	ridge.fit(X,X_next)
 
+#リッジ回帰で学習を行う。price2,price3を説明変数とする。
+def learnRidge3(ridge,price1,price2,price3):
+	end_count = len(price1)
+	X = [[0 for j in range(2)] for i in range(end_count)]
+	X_next = [0 for i in range(end_count)]
+	i=0
+	for i,x in enumerate(price1):
+		if i < len(price2):
+			if x["close_time"] == price2[i]["close_time"]:
+				X[i][0] = price2[i]["close_price"]
+		if i < len(price3): 
+			if(x["close_time"] == price3[i]["close_time"]):
+				X[i][1] = price3[i]["close_price"]
+
+		X_next[i] = x["close_price"]
+	ridge.fit(X,X_next)
+
 #リッジ回帰で学習した内容から価格の予想を行う
 def predictRidge(ridge,price,start_num,end_num):
 	end_count = len(price)
@@ -545,6 +570,21 @@ def predictRidge(ridge,price,start_num,end_num):
 			X[i-1][8] = x["close_price"]
 		X[i][4] = x["open_price"]
 		X[i][9] = x["close_price"]
+	y_pred = ridge.predict(X)
+	return y_pred
+
+#リッジ回帰で学習した内容から価格の予想を行う。learnRidge3に対応
+def predictRidge3(ridge,price2,price3,start_num,end_num):
+	end_count = len(price2)
+	X = [[0 for j in range(2)] for i in range(end_num-start_num)]
+	i=0
+	for i,x in enumerate(price2[end_count-(end_num-start_num)::]):
+		if i < len(price2):
+			if x["close_time"] == price2[i]["close_time"]:
+				X[i][0] = x["close_price"]
+		if i < len(price3): 
+			if(x["close_time"] == price3[i]["close_time"]):
+				X[i][1] = price3[i]["close_price"]
 	y_pred = ridge.predict(X)
 	return y_pred
 
